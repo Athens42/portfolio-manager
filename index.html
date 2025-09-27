@@ -1,14 +1,30 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Test</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Manager</title>
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <h1>Portfolio Manager Test</h1>
-    <p id="test">Original text</p>
+    <div class="container">
+        <h1>Portfolio Management System</h1>
+        
+        <div class="section">
+            <h2>Import Avanza CSV</h2>
+            <input type="file" id="csvFileInput" accept=".csv" />
+            <button id="importBtn" onclick="importCSV()">Import Portfolio Data</button>
+        </div>
+        
+        <div class="section">
+            <h2>Portfolio Data</h2>
+            <div id="portfolioData">
+                <p>No data imported yet. Please select and import a CSV file.</p>
+            </div>
+        </div>
+    </div>
     
-    <script>
-        document.getElementById('test').innerHTML = 'JavaScript is working!';
-    </script>
+    <script src="js/main.js"></script>
+    <script src="js/csvImporter.js"></script>
 </body>
 </html>

@@ -61,7 +61,7 @@ function parseCSV(csvContent) {
     }
 }
 
-// Function to display the imported data
+// Function to display the imported data with ticker mapping
 function displayPortfolioData() {
     const container = document.getElementById('portfolioData');
     
@@ -72,19 +72,44 @@ function displayPortfolioData() {
     
     let html = `<p>Successfully imported ${portfolioData.length} holdings!</p>`;
     html += '<table border="1" style="width:100%; border-collapse: collapse;">';
-    html += '<tr><th>Account</th><th>Name</th><th>Ticker</th><th>Volume</th><th>Market Value</th><th>Currency</th></tr>';
+    html += '<tr><th>Account</th><th>Name</th><th>Avanza Ticker</th><th>Yahoo Ticker</th><th>Volume</th><th>Market Value</th><th>Currency</th><th>Action</th></tr>';
     
-    portfolioData.forEach(row => {
-        html += `<tr>
+    portfolioData.forEach((row, index) => {
+        const avanzaTicker = row['Kortnamn'] || '';
+        const yahooTicker = convertTicker(avanzaTicker);
+        const needsMapping = yahooTicker === avanzaTicker && avanzaTicker !== '' && avanzaTicker !== 'FUND';
+        
+        html += `<tr ${needsMapping ? 'style="background-color: #fff3cd;"' : ''}>
             <td>${row['Kontonummer'] || ''}</td>
             <td>${row['Namn'] || ''}</td>
-            <td>${row['Kortnamn'] || ''}</td>
+            <td>${avanzaTicker}</td>
+            <td>
+                <input type="text" id="ticker_${index}" value="${yahooTicker}" 
+                       style="width: 100px; ${needsMapping ? 'border: 2px solid orange;' : ''}" />
+            </td>
             <td>${row['Volym'] || ''}</td>
             <td>${row['Marknadsvärde'] || ''}</td>
             <td>${row['Valuta'] || ''}</td>
+            <td>
+                <button onclick="updateTicker(${index}, '${avanzaTicker}')" style="font-size: 12px; padding: 5px;">Save</button>
+            </td>
         </tr>`;
     });
     
     html += '</table>';
+    html += '<p><strong>Note:</strong> Yellow rows need ticker mapping. Orange borders indicate unmapped tickers.</p>';
     container.innerHTML = html;
+}
+
+// Function to update ticker mapping
+function updateTicker(rowIndex, avanzaTicker) {
+    const newYahooTicker = document.getElementById(`ticker_${rowIndex}`).value.trim();
+    
+    if (newYahooTicker && newYahooTicker !== avanzaTicker) {
+        saveTickerMapping(avanzaTicker, newYahooTicker);
+        alert(`Mapping saved: ${avanzaTicker} -> ${newYahooTicker}`);
+        
+        // Refresh the display
+        displayPortfolioData();
+    }
 }

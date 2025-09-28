@@ -336,9 +336,11 @@ function updateAggregatedView() {
         </tr>`;
     });
     
-    html += '</table>';
-    html += `<p><strong>Total Portfolio Value: ${totalPortfolioValue.toLocaleString()} (mixed currencies)</strong></p>`;
-    html += `<p><em>Note: Values are in original currencies. Currency conversion will be added in next step.</em></p>`;
-    
+   html += '</table>';
+    html += '<p><strong>Note:</strong> Yellow rows need ticker mapping. Funds are ignored. US stocks (USD currency) typically don\'t need .ST suffix.</p>';
     container.innerHTML = html;
+    
+    // Show account selection after displaying portfolio data
+    displayAccountSelection();
+}
 }

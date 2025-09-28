@@ -340,7 +340,6 @@ function updateAggregatedView() {
     html += '<p><strong>Note:</strong> Yellow rows need ticker mapping. Funds are ignored. US stocks (USD currency) typically don\'t need .ST suffix.</p>';
     container.innerHTML = html;
     
-    // Show account selection after displaying portfolio data
-    displayAccountSelection();
+
 }
 }

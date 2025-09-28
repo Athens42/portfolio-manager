@@ -72,16 +72,38 @@ function displayPortfolioData() {
     
     let html = `<p>Successfully imported ${portfolioData.length} holdings!</p>`;
     html += '<table border="1" style="width:100%; border-collapse: collapse;">';
-    html += '<tr><th>Account</th><th>Name</th><th>Avanza Ticker</th><th>Yahoo Ticker</th><th>Volume</th><th>Market Value</th><th>Currency</th><th>Action</th></tr>';
+    html += '<tr><th>Account</th><th>Name</th><th>Type</th><th>Avanza Ticker</th><th>Yahoo Ticker</th><th>Volume</th><th>Market Value</th><th>Currency</th><th>Action</th></tr>';
     
     portfolioData.forEach((row, index) => {
         const avanzaTicker = row['Kortnamn'] || '';
+        const stockType = row['Typ'] || '';
         const yahooTicker = convertTicker(avanzaTicker);
-        const needsMapping = yahooTicker === avanzaTicker && avanzaTicker !== '' && avanzaTicker !== 'FUND';
+        
+        // Skip funds or empty tickers
+        if (stockType === 'FUND' || avanzaTicker === '') {
+            html += `<tr style="background-color: #f8f9fa; color: #6c757d;">
+                <td>${row['Kontonummer'] || ''}</td>
+                <td>${row['Namn'] || ''}</td>
+                <td>${stockType}</td>
+                <td>${avanzaTicker}</td>
+                <td><em>N/A (Fund)</em></td>
+                <td>${row['Volym'] || ''}</td>
+                <td>${row['Marknadsvärde'] || ''}</td>
+                <td>${row['Valuta'] || ''}</td>
+                <td><em>Ignored</em></td>
+            </tr>`;
+            return;
+        }
+        
+        // Check if mapping exists or if it's already a valid ticker
+        const hasMapping = tickerMapping[avanzaTicker] !== undefined;
+        const isUSStock = yahooTicker === avanzaTicker && (yahooTicker.match(/^[A-Z]{1,5}$/) && row['Valuta'] === 'USD');
+        const needsMapping = !hasMapping && !isUSStock && yahooTicker === avanzaTicker;
         
         html += `<tr ${needsMapping ? 'style="background-color: #fff3cd;"' : ''}>
             <td>${row['Kontonummer'] || ''}</td>
             <td>${row['Namn'] || ''}</td>
+            <td>${stockType}</td>
             <td>${avanzaTicker}</td>
             <td>
                 <input type="text" id="ticker_${index}" value="${yahooTicker}" 
@@ -97,10 +119,9 @@ function displayPortfolioData() {
     });
     
     html += '</table>';
-    html += '<p><strong>Note:</strong> Yellow rows need ticker mapping. Orange borders indicate unmapped tickers.</p>';
+    html += '<p><strong>Note:</strong> Yellow rows need ticker mapping. Funds are ignored. US stocks (USD currency) typically don\'t need .ST suffix.</p>';
     container.innerHTML = html;
 }
-
 // Function to update ticker mapping
 function updateTicker(rowIndex, avanzaTicker) {
     const newYahooTicker = document.getElementById(`ticker_${rowIndex}`).value.trim();

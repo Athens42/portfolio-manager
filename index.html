@@ -225,11 +225,12 @@ function displayPortfolioData() {
                 <td>${row['Valuta'] || ''}</td>
             </tr>`;
         }
-        displayAccountSelection();
+       
     });
     
     html += '</table>';
     container.innerHTML = html;
+    displayAccountSelection();
 }
 
 // Placeholder functions for buttons

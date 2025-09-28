@@ -69,6 +69,15 @@ async function loadTickerMapping() {
     }
 }
 
+// Add this function right after the loadTickerMapping() function:
+function convertTicker(avanzaTicker) {
+    if (!avanzaTicker || avanzaTicker === '') return '';
+    if (tickerMapping[avanzaTicker]) {
+        return tickerMapping[avanzaTicker];
+    }
+    return avanzaTicker;
+}
+
 // Import CSV function
 function importCSV() {
     const fileInput = document.getElementById('csvFileInput');

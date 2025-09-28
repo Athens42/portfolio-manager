@@ -189,6 +189,29 @@ function updateTicker(rowIndex, avanzaTicker) {
     // Refresh the display
     displayPortfolioData();
 }
+
+// Function to import CSV file
+function importCSV() {
+    const fileInput = document.getElementById('csvFileInput');
+    const file = fileInput.files[0];
+    
+    if (!file) {
+        alert('Please select a CSV file first!');
+        return;
+    }
+    
+    if (!file.name.toLowerCase().endsWith('.csv')) {
+        alert('Please select a CSV file!');
+        return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const csvContent = e.target.result;
+        parseCSV(csvContent);
+    };
+    reader.readAsText(file);
+}
 // Account selection functionality
 let selectedAccounts = new Set();
 

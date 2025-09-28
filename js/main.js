@@ -1,9 +1,42 @@
 // Portfolio Manager - Main Application
 console.log('Portfolio Manager starting...');
 
-// Global variable to store portfolio data
+// Global variables
 let portfolioData = [];
+let tickerMapping = {};
 
+// Load ticker mapping from JSON file
+async function loadTickerMapping() {
+    try {
+        const response = await fetch('data/ticker-mapping.json');
+        tickerMapping = await response.json();
+        console.log('Ticker mapping loaded:', Object.keys(tickerMapping).length, 'mappings');
+    } catch (error) {
+        console.error('Error loading ticker mapping:', error);
+        tickerMapping = {};
+    }
+}
+
+// Convert Avanza ticker to Yahoo Finance ticker
+function convertTicker(avanzaTicker) {
+    if (!avanzaTicker || avanzaTicker === '') return '';
+    
+    // Check if we have a mapping
+    if (tickerMapping[avanzaTicker]) {
+        return tickerMapping[avanzaTicker];
+    }
+    
+    // Return original if no mapping found
+    return avanzaTicker;
+}
+
+// Save a new ticker mapping
+function saveTickerMapping(avanzaTicker, yahooTicker) {
+    tickerMapping[avanzaTicker] = yahooTicker;
+    console.log('Saved mapping:', avanzaTicker, '->', yahooTicker);
+}
+
+// Initialize when page loads
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Portfolio Manager loaded successfully!');
     loadTickerMapping();
@@ -39,42 +72,6 @@ function parseCSV(csvContent) {
         const headers = lines[0].split(';');
         
         portfolioData = [];
-        // Global variable to store portfolio data
-let portfolioData = [];
-
-// Ticker mapping functionality
-let tickerMapping = {};
-
-// Load ticker mapping from JSON file
-async function loadTickerMapping() {
-    try {
-        const response = await fetch('data/ticker-mapping.json');
-        tickerMapping = await response.json();
-        console.log('Ticker mapping loaded:', Object.keys(tickerMapping).length, 'mappings');
-    } catch (error) {
-        console.error('Error loading ticker mapping:', error);
-        tickerMapping = {};
-    }
-}
-
-// Convert Avanza ticker to Yahoo Finance ticker
-function convertTicker(avanzaTicker) {
-    if (!avanzaTicker || avanzaTicker === '') return '';
-    
-    // Check if we have a mapping
-    if (tickerMapping[avanzaTicker]) {
-        return tickerMapping[avanzaTicker];
-    }
-    
-    // Return original if no mapping found
-    return avanzaTicker;
-}
-
-// Save a new ticker mapping
-function saveTickerMapping(avanzaTicker, yahooTicker) {
-    tickerMapping[avanzaTicker] = yahooTicker;
-    console.log('Saved mapping:', avanzaTicker, '->', yahooTicker);
-}
         
         for (let i = 1; i < lines.length; i++) {
             if (lines[i].trim() === '') continue; // Skip empty lines
@@ -98,7 +95,7 @@ function saveTickerMapping(avanzaTicker, yahooTicker) {
     }
 }
 
-// Function to display the imported data with ticker mapping
+// Function to display the imported data
 function displayPortfolioData() {
     const container = document.getElementById('portfolioData');
     
@@ -159,15 +156,20 @@ function displayPortfolioData() {
     html += '<p><strong>Note:</strong> Yellow rows need ticker mapping. Funds are ignored. US stocks (USD currency) typically don\'t need .ST suffix.</p>';
     container.innerHTML = html;
 }
+
 // Function to update ticker mapping
 function updateTicker(rowIndex, avanzaTicker) {
     const newYahooTicker = document.getElementById(`ticker_${rowIndex}`).value.trim();
     
-    if (newYahooTicker && newYahooTicker !== avanzaTicker) {
-        saveTickerMapping(avanzaTicker, newYahooTicker);
-        alert(`Mapping saved: ${avanzaTicker} -> ${newYahooTicker}`);
-        
-        // Refresh the display
-        displayPortfolioData();
+    if (!newYahooTicker) {
+        alert('Please enter a valid ticker');
+        return;
     }
+    
+    // Save the mapping even if it's the same (confirms it's correct)
+    saveTickerMapping(avanzaTicker, newYahooTicker);
+    alert(`Mapping saved: ${avanzaTicker} -> ${newYahooTicker}`);
+    
+    // Refresh the display
+    displayPortfolioData();
 }

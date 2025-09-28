@@ -413,3 +413,48 @@ function updateAggregatedViewWithCurrency() {
 function updateAggregatedView() {
     updateAggregatedViewWithCurrency();
 }
+// Currency conversion functionality
+let exchangeRates = {
+    'SEK': 1.0,
+    'USD': 10.5,
+    'EUR': 11.5,
+    'DKK': 1.55
+};
+
+// Fetch current exchange rates
+async function fetchExchangeRates() {
+    const statusDiv = document.getElementById('exchangeRateStatus');
+    statusDiv.innerHTML = '<p>Fetching exchange rates...</p>';
+    
+    try {
+        const response = await fetch('https://api.exchangerate-api.com/v4/latest/SEK');
+        const data = await response.json();
+        
+        exchangeRates = {
+            'SEK': 1.0,
+            'USD': 1 / data.rates.USD,
+            'EUR': 1 / data.rates.EUR,
+            'DKK': 1 / data.rates.DKK
+        };
+        
+        let html = '<p><strong>Exchange rates updated:</strong></p>';
+        html += '<ul>';
+        Object.entries(exchangeRates).forEach(([currency, rate]) => {
+            if (currency !== 'SEK') {
+                html += `<li>1 ${currency} = ${rate.toFixed(4)} SEK</li>`;
+            }
+        });
+        html += '</ul>';
+        
+        statusDiv.innerHTML = html;
+        
+    } catch (error) {
+        console.error('Error fetching exchange rates:', error);
+        statusDiv.innerHTML = '<p style="color: red;">Error fetching exchange rates. Using default rates.</p>';
+    }
+}
+
+// Placeholder for stock prices (we'll add this next)
+function fetchStockPrices() {
+    alert('Stock price fetching will be added in the next step!');
+}

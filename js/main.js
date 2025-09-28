@@ -194,12 +194,45 @@ let selectedAccounts = new Set();
 
 // Function to display account selection checkboxes
 function displayAccountSelection() {
+    console.log('displayAccountSelection called');
     const container = document.getElementById('accountSelection');
+    console.log('Container found:', container);
     
     if (portfolioData.length === 0) {
+        console.log('No portfolio data available');
         container.innerHTML = '<p>Import CSV data first to see accounts.</p>';
         return;
     }
+    
+    console.log('Portfolio data length:', portfolioData.length);
+    
+    // Get unique accounts
+    const accounts = [...new Set(portfolioData.map(row => row['Kontonummer']).filter(acc => acc))];
+    console.log('Found accounts:', accounts);
+    
+    // Initialize all accounts as selected
+    if (selectedAccounts.size === 0) {
+        accounts.forEach(acc => selectedAccounts.add(acc));
+    }
+    
+    let html = '<p>Select accounts to include in analysis:</p>';
+    
+    accounts.forEach(account => {
+        const isChecked = selectedAccounts.has(account);
+        html += `
+            <label style="display: block; margin: 5px 0;">
+                <input type="checkbox" ${isChecked ? 'checked' : ''} 
+                       onchange="toggleAccount('${account}')" />
+                Account: ${account}
+            </label>
+        `;
+    });
+    
+    html += '<br><button onclick="updateAggregatedView()" style="margin-top: 10px;">Update Aggregated View</button>';
+    
+    console.log('Setting HTML:', html);
+    container.innerHTML = html;
+}
     
     // Get unique accounts
     const accounts = [...new Set(portfolioData.map(row => row['Kontonummer']).filter(acc => acc))];

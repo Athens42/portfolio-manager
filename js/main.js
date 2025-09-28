@@ -65,16 +65,25 @@ function importCSV() {
     reader.readAsText(file);
 }
 
-// Function to parse CSV content
+// Function to parse CSV content - DEBUG VERSION
 function parseCSV(csvContent) {
     try {
+        console.log('CSV Content length:', csvContent.length);
+        console.log('First 200 characters:', csvContent.substring(0, 200));
+        
         const lines = csvContent.split('\n');
+        console.log('Number of lines:', lines.length);
+        console.log('First line (headers):', lines[0]);
+        
         const headers = lines[0].split(';');
+        console.log('Headers found:', headers);
         
         portfolioData = [];
         
         for (let i = 1; i < lines.length; i++) {
             if (lines[i].trim() === '') continue; // Skip empty lines
+            
+            console.log('Processing line', i, ':', lines[i].substring(0, 100));
             
             const values = lines[i].split(';');
             const row = {};
@@ -86,12 +95,15 @@ function parseCSV(csvContent) {
             portfolioData.push(row);
         }
         
+        console.log('Successfully parsed', portfolioData.length, 'rows');
+        console.log('First row:', portfolioData[0]);
+        
         displayPortfolioData();
-        console.log('Imported', portfolioData.length, 'holdings');
         
     } catch (error) {
+        console.error('Detailed CSV parsing error:', error);
+        console.error('Error stack:', error.stack);
         alert('Error parsing CSV file: ' + error.message);
-        console.error('CSV parsing error:', error);
     }
 }
 

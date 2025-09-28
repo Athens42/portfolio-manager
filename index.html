@@ -304,24 +304,22 @@ function updateAggregatedView() {
         
         if (!yahooTicker || yahooTicker === '') return;
         
-        if (!aggregated[yahooTicker]) {
-            aggregated[yahooTicker] = {
-                name: name,
-                ticker: yahooTicker,
-                totalVolume: 0,
-                totalValueOriginal: 0,
-                totalValueSEK: 0,
-                currency: currency,
-                accounts: new Set()
-            };
-        }
+       if (!aggregated[yahooTicker]) {
+    aggregated[yahooTicker] = {
+        name: name,
+        ticker: yahooTicker,
+        totalVolume: 0,
+        totalValueOriginal: 0,
+        totalValueSEK: 0,
+        currency: currency,
+        accounts: new Set()
+    };
+}
+
+aggregated[yahooTicker].totalVolume += volume;
+aggregated[yahooTicker].totalValueOriginal += marketValue; // Keep original currency value
+aggregated[yahooTicker].totalValueSEK += convertToSEK(marketValue, currency); // Convert to SEK
         
-        aggregated[yahooTicker].totalVolume += volume;
-        aggregated[yahooTicker].totalValueOriginal += marketValue;
-        aggregated[yahooTicker].totalValueSEK += convertToSEK(marketValue, currency);
-        aggregated[yahooTicker].accounts.add(row['Kontonummer']);
-    });
-    
     const sortedStocks = Object.values(aggregated).sort((a, b) => b.totalValueSEK - a.totalValueSEK);
     
     let html = `<p>Aggregated view for ${selectedAccounts.size} selected accounts (converted to SEK):</p>`;

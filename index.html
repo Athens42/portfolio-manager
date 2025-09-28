@@ -108,7 +108,7 @@ function displayAccountSelection() {
         `;
     });
     
-    html += '<br><button onclick="testAggregation()" style="margin-top: 10px;">Update Aggregated View</button>';
+   html += '<br><button onclick="updateAggregatedView()" style="margin-top: 10px;">Update Aggregated View</button>';
     
     container.innerHTML = html;
 }
@@ -121,10 +121,76 @@ function toggleAccount(accountNumber) {
     }
 }
 
-function testAggregation() {
-    alert('Selected accounts: ' + Array.from(selectedAccounts).join(', '));
+function updateAggregatedView() {
+    const container = document.getElementById('aggregatedView');
+    
+    if (portfolioData.length === 0 || selectedAccounts.size === 0) {
+        container.innerHTML = '<p>Select accounts and ensure data is imported to see aggregated view.</p>';
+        return;
+    }
+    
+    // Filter data by selected accounts and exclude funds
+    const filteredData = portfolioData.filter(row => {
+        const account = row['Kontonummer'];
+        const type = row['Typ'];
+        return selectedAccounts.has(account) && type !== 'FUND';
+    });
+    
+    // Group by Yahoo ticker
+    const aggregated = {};
+    
+    filteredData.forEach(row => {
+        const avanzaTicker = row['Kortnamn'] || '';
+        const yahooTicker = convertTicker(avanzaTicker);
+        const volume = parseFloat(row['Volym']) || 0;
+        const marketValue = parseFloat(row['Marknadsvärde'].replace(',', '.')) || 0;
+        const currency = row['Valuta'] || '';
+        const name = row['Namn'] || '';
+        
+        if (!yahooTicker || yahooTicker === '') return;
+        
+        if (!aggregated[yahooTicker]) {
+            aggregated[yahooTicker] = {
+                name: name,
+                ticker: yahooTicker,
+                totalVolume: 0,
+                totalValue: 0,
+                currency: currency,
+                accounts: new Set()
+            };
+        }
+        
+        aggregated[yahooTicker].totalVolume += volume;
+        aggregated[yahooTicker].totalValue += marketValue;
+        aggregated[yahooTicker].accounts.add(row['Kontonummer']);
+    });
+    
+    // Convert to array and sort by value
+    const sortedStocks = Object.values(aggregated).sort((a, b) => b.totalValue - a.totalValue);
+    
+    let html = `<p>Aggregated view for ${selectedAccounts.size} selected accounts:</p>`;
+    html += '<table border="1" style="width:100%; border-collapse: collapse;">';
+    html += '<tr><th>Stock Name</th><th>Yahoo Ticker</th><th>Total Volume</th><th>Total Value</th><th>Currency</th><th>Accounts</th></tr>';
+    
+    let totalPortfolioValue = 0;
+    
+    sortedStocks.forEach(stock => {
+        totalPortfolioValue += stock.totalValue;
+        html += `<tr>
+            <td>${stock.name}</td>
+            <td>${stock.ticker}</td>
+            <td>${stock.totalVolume.toLocaleString()}</td>
+            <td>${stock.totalValue.toLocaleString()} ${stock.currency}</td>
+            <td>${stock.currency}</td>
+            <td>${Array.from(stock.accounts).join(', ')}</td>
+        </tr>`;
+    });
+    
+    html += '</table>';
+    html += `<p><strong>Total Portfolio Value: ${totalPortfolioValue.toLocaleString()} (mixed currencies)</strong></p>`;
+    
+    container.innerHTML = html;
 }
-
 // Import CSV function
 function importCSV() {
     const fileInput = document.getElementById('csvFileInput');

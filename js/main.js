@@ -114,6 +114,7 @@ function displayPortfolioData() {
     if (portfolioData.length === 0) {
         container.innerHTML = '<p>No data imported yet.</p>';
         return;
+        displayAccountSelection();
     }
     
     let html = `<p>Successfully imported ${portfolioData.length} holdings!</p>`;
@@ -184,4 +185,124 @@ function updateTicker(rowIndex, avanzaTicker) {
     
     // Refresh the display
     displayPortfolioData();
+}
+// Account selection functionality
+let selectedAccounts = new Set();
+
+// Function to display account selection checkboxes
+function displayAccountSelection() {
+    const container = document.getElementById('accountSelection');
+    
+    if (portfolioData.length === 0) {
+        container.innerHTML = '<p>Import CSV data first to see accounts.</p>';
+        return;
+    }
+    
+    // Get unique accounts
+    const accounts = [...new Set(portfolioData.map(row => row['Kontonummer']).filter(acc => acc))];
+    
+    // Initialize all accounts as selected
+    if (selectedAccounts.size === 0) {
+        accounts.forEach(acc => selectedAccounts.add(acc));
+    }
+    
+    let html = '<p>Select accounts to include in analysis:</p>';
+    
+    accounts.forEach(account => {
+        const isChecked = selectedAccounts.has(account);
+        html += `
+            <label style="display: block; margin: 5px 0;">
+                <input type="checkbox" ${isChecked ? 'checked' : ''} 
+                       onchange="toggleAccount('${account}')" />
+                Account: ${account}
+            </label>
+        `;
+    });
+    
+    html += '<br><button onclick="updateAggregatedView()" style="margin-top: 10px;">Update Aggregated View</button>';
+    
+    container.innerHTML = html;
+}
+
+// Function to toggle account selection
+function toggleAccount(accountNumber) {
+    if (selectedAccounts.has(accountNumber)) {
+        selectedAccounts.delete(accountNumber);
+    } else {
+        selectedAccounts.add(accountNumber);
+    }
+    console.log('Selected accounts:', Array.from(selectedAccounts));
+}
+
+// Function to create aggregated portfolio view
+function updateAggregatedView() {
+    const container = document.getElementById('aggregatedView');
+    
+    if (portfolioData.length === 0 || selectedAccounts.size === 0) {
+        container.innerHTML = '<p>Select accounts and ensure data is imported to see aggregated view.</p>';
+        return;
+    }
+    
+    // Filter data by selected accounts and exclude funds
+    const filteredData = portfolioData.filter(row => {
+        const account = row['Kontonummer'];
+        const type = row['Typ'];
+        return selectedAccounts.has(account) && type !== 'FUND';
+    });
+    
+    // Group by Yahoo ticker
+    const aggregated = {};
+    
+    filteredData.forEach(row => {
+        const avanzaTicker = row['Kortnamn'] || '';
+        const yahooTicker = convertTicker(avanzaTicker);
+        const volume = parseFloat(row['Volym']) || 0;
+        const marketValue = parseFloat(row['Marknadsvärde'].replace(',', '.')) || 0;
+        const currency = row['Valuta'] || '';
+        const name = row['Namn'] || '';
+        
+        if (!yahooTicker || yahooTicker === '') return;
+        
+        if (!aggregated[yahooTicker]) {
+            aggregated[yahooTicker] = {
+                name: name,
+                ticker: yahooTicker,
+                totalVolume: 0,
+                totalValue: 0,
+                currency: currency,
+                accounts: new Set()
+            };
+        }
+        
+        aggregated[yahooTicker].totalVolume += volume;
+        aggregated[yahooTicker].totalValue += marketValue;
+        aggregated[yahooTicker].accounts.add(row['Kontonummer']);
+    });
+    
+    // Convert to array and sort by value
+    const sortedStocks = Object.values(aggregated).sort((a, b) => b.totalValue - a.totalValue);
+    
+    let html = `<p>Aggregated view for ${selectedAccounts.size} selected accounts:</p>`;
+    html += '<table border="1" style="width:100%; border-collapse: collapse;">';
+    html += '<tr><th>Stock Name</th><th>Yahoo Ticker</th><th>Total Volume</th><th>Total Value</th><th>Currency</th><th>Accounts</th></tr>';
+    
+    let totalPortfolioValue = 0;
+    
+    sortedStocks.forEach(stock => {
+        totalPortfolioValue += stock.totalValue;
+        html += `<tr>
+            <td>${stock.name}</td>
+            <td>${stock.ticker}</td>
+            <td>${stock.totalVolume.toLocaleString()}</td>
+            <td>${stock.totalValue.toLocaleString()} ${stock.currency}</td>
+            <td>${stock.currency}</td>
+            <td>${Array.from(stock.accounts).join(', ')}</td>
+        </tr>`;
+    });
+    
+    html += '</table>';
+    html += `<p><strong>Total Portfolio Value: ${totalPortfolioValue.toLocaleString()} (mixed currencies)</strong></p>`;
+    html += `<p><em>Note: Values are in original currencies. Currency conversion will be added in next step.</em></p>`;
+    
+    container.innerHTML = html;
 }

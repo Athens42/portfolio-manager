@@ -6,6 +6,7 @@ let portfolioData = [];
 
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Portfolio Manager loaded successfully!');
+    loadTickerMapping();
 });
 
 // Function to import CSV file
@@ -38,6 +39,42 @@ function parseCSV(csvContent) {
         const headers = lines[0].split(';');
         
         portfolioData = [];
+        // Global variable to store portfolio data
+let portfolioData = [];
+
+// Ticker mapping functionality
+let tickerMapping = {};
+
+// Load ticker mapping from JSON file
+async function loadTickerMapping() {
+    try {
+        const response = await fetch('data/ticker-mapping.json');
+        tickerMapping = await response.json();
+        console.log('Ticker mapping loaded:', Object.keys(tickerMapping).length, 'mappings');
+    } catch (error) {
+        console.error('Error loading ticker mapping:', error);
+        tickerMapping = {};
+    }
+}
+
+// Convert Avanza ticker to Yahoo Finance ticker
+function convertTicker(avanzaTicker) {
+    if (!avanzaTicker || avanzaTicker === '') return '';
+    
+    // Check if we have a mapping
+    if (tickerMapping[avanzaTicker]) {
+        return tickerMapping[avanzaTicker];
+    }
+    
+    // Return original if no mapping found
+    return avanzaTicker;
+}
+
+// Save a new ticker mapping
+function saveTickerMapping(avanzaTicker, yahooTicker) {
+    tickerMapping[avanzaTicker] = yahooTicker;
+    console.log('Saved mapping:', avanzaTicker, '->', yahooTicker);
+}
         
         for (let i = 1; i < lines.length; i++) {
             if (lines[i].trim() === '') continue; // Skip empty lines

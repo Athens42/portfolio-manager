@@ -134,6 +134,54 @@ function displayBasicData() {
     container.innerHTML = html;
 }
 
+    // Convert ticker function
+function convertTicker(avanzaTicker) {
+    if (!avanzaTicker || avanzaTicker === '') return '';
+    if (tickerMapping[avanzaTicker]) {
+        return tickerMapping[avanzaTicker];
+    }
+    return avanzaTicker;
+}
+
+// Enhanced display with ticker mapping
+function displayPortfolioData() {
+    const container = document.getElementById('portfolioData');
+    let html = `<p>Successfully imported ${portfolioData.length} holdings!</p>`;
+    html += '<table border="1" style="width:100%; border-collapse: collapse;">';
+    html += '<tr><th>Account</th><th>Name</th><th>Avanza Ticker</th><th>Yahoo Ticker</th><th>Volume</th><th>Value</th><th>Currency</th></tr>';
+    
+    portfolioData.forEach((row, index) => {
+        const avanzaTicker = row['Kortnamn'] || '';
+        const yahooTicker = convertTicker(avanzaTicker);
+        const stockType = row['Typ'] || '';
+        
+        if (stockType === 'FUND') {
+            html += `<tr style="background-color: #f8f9fa; color: #6c757d;">
+                <td>${row['Kontonummer'] || ''}</td>
+                <td>${row['Namn'] || ''}</td>
+                <td>${avanzaTicker}</td>
+                <td><em>Fund</em></td>
+                <td>${row['Volym'] || ''}</td>
+                <td>${row['Marknadsvärde'] || ''}</td>
+                <td>${row['Valuta'] || ''}</td>
+            </tr>`;
+        } else {
+            html += `<tr>
+                <td>${row['Kontonummer'] || ''}</td>
+                <td>${row['Namn'] || ''}</td>
+                <td>${avanzaTicker}</td>
+                <td>${yahooTicker}</td>
+                <td>${row['Volym'] || ''}</td>
+                <td>${row['Marknadsvärde'] || ''}</td>
+                <td>${row['Valuta'] || ''}</td>
+            </tr>`;
+        }
+    });
+    
+    html += '</table>';
+    container.innerHTML = html;
+}
+
 // Placeholder functions for buttons
 function fetchExchangeRates() {
     alert('Exchange rates - coming next!');

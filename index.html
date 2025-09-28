@@ -42,6 +42,7 @@
             <div id="currencyControls">
                 <button onclick="fetchExchangeRates()" style="margin: 5px;">Update Exchange Rates</button>
                 <button onclick="fetchStockPrices()" style="margin: 5px;">Fetch Current Stock Prices</button>
+                <button onclick="savePortfolioSnapshot()" style="margin: 5px;">Save Daily Portfolio Snapshot</button>
                 <div id="exchangeRateStatus">
                     <p>Click "Update Exchange Rates" to fetch current rates.</p>
                 </div>
@@ -278,6 +279,53 @@ html += `<tr>
     displayAccountSelection();
 }
 
+    // Save current portfolio snapshot to Supabase
+async function savePortfolioSnapshot() {
+    if (portfolioData.length === 0 || selectedAccounts.size === 0) {
+        alert('Please import portfolio data and select accounts first');
+        return;
+    }
+    
+    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+    const totalValue = calculateCurrentTotalValue();
+    
+    try {
+        const { data, error } = await supabase
+            .from('portfolio_snapshots')
+            .insert([{
+                date: today,
+                total_value_sek: totalValue,
+                notes: `${portfolioData.length} holdings, ${selectedAccounts.size} accounts`
+            }]);
+            
+        if (error) throw error;
+        
+        alert(`Portfolio snapshot saved for ${today}: ${totalValue.toLocaleString()} SEK`);
+        
+    } catch (error) {
+        console.error('Error saving snapshot:', error);
+        alert('Error saving snapshot: ' + error.message);
+    }
+}
+
+// Calculate total portfolio value (reuse aggregation logic)
+function calculateCurrentTotalValue() {
+    const filteredData = portfolioData.filter(row => {
+        const account = row['Kontonummer'];
+        const type = row['Typ'];
+        return selectedAccounts.has(account) && type !== 'FUND';
+    });
+    
+    let total = 0;
+    filteredData.forEach(row => {
+        const marketValue = parseFloat(row['Marknadsvärde'].replace(',', '.')) || 0;
+        total += marketValue;
+    });
+    
+    return total;
+}
+
+    
 // Placeholder functions
 function fetchExchangeRates() {
     alert('Exchange rates - coming next!');

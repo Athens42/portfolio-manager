@@ -1,3 +1,10 @@
+console.log('csvImporter.js loaded!');
+
+// CSV Importer with Ticker Mapping
+let tickerMapping = {};
+
+// ... rest of your code stays the same
+
 // CSV Importer with Ticker Mapping
 let tickerMapping = {};
 

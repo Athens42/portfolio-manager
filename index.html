@@ -36,6 +36,17 @@
                 <p>Select accounts and ensure tickers are mapped to see aggregated view.</p>
             </div>
         </div>
+        
+        <div class="section">
+            <h2>Currency & Price Updates</h2>
+            <div id="currencyControls">
+                <button onclick="fetchExchangeRates()" style="margin: 5px;">Update Exchange Rates</button>
+                <button onclick="fetchStockPrices()" style="margin: 5px;">Fetch Current Stock Prices</button>
+                <div id="exchangeRateStatus">
+                    <p>Click "Update Exchange Rates" to fetch current rates.</p>
+                </div>
+            </div>
+        </div>
     </div>
     
     <script src="js/main.js"></script>

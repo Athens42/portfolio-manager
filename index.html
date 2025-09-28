@@ -233,6 +233,54 @@ function displayPortfolioData() {
     displayAccountSelection();
 }
 
+// Account selection variables and functions
+let selectedAccounts = new Set();
+
+function displayAccountSelection() {
+    const container = document.getElementById('accountSelection');
+    
+    if (portfolioData.length === 0) {
+        container.innerHTML = '<p>Import CSV data first to see accounts.</p>';
+        return;
+    }
+    
+    const accounts = [...new Set(portfolioData.map(row => row['Kontonummer']).filter(acc => acc))];
+    
+    if (selectedAccounts.size === 0) {
+        accounts.forEach(acc => selectedAccounts.add(acc));
+    }
+    
+    let html = '<p>Select accounts to include in analysis:</p>';
+    
+    accounts.forEach(account => {
+        const isChecked = selectedAccounts.has(account);
+        html += `
+            <label style="display: block; margin: 5px 0;">
+                <input type="checkbox" ${isChecked ? 'checked' : ''} 
+                       onchange="toggleAccount('${account}')" />
+                Account: ${account}
+            </label>
+        `;
+    });
+    
+    html += '<br><button onclick="showSimpleAggregation()" style="margin-top: 10px;">Update Aggregated View</button>';
+    
+    container.innerHTML = html;
+}
+
+function toggleAccount(accountNumber) {
+    if (selectedAccounts.has(accountNumber)) {
+        selectedAccounts.delete(accountNumber);
+    } else {
+        selectedAccounts.add(accountNumber);
+    }
+}
+
+function showSimpleAggregation() {
+    const container = document.getElementById('aggregatedView');
+    container.innerHTML = '<p>Simple aggregation coming next step!</p>';
+}
+    
 // Placeholder functions for buttons
 function fetchExchangeRates() {
     alert('Exchange rates - coming next!');

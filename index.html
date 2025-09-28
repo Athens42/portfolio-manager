@@ -126,17 +126,21 @@ function displayBasicData() {
     const container = document.getElementById('portfolioData');
     let html = `<p>Successfully imported ${portfolioData.length} holdings!</p>`;
     html += '<table border="1" style="width:100%; border-collapse: collapse;">';
-    html += '<tr><th>Account</th><th>Name</th><th>Ticker</th><th>Volume</th><th>Value</th><th>Currency</th></tr>';
+    html += '<tr><th>Account</th><th>Name</th><th>Avanza Ticker</th><th>Yahoo Ticker</th><th>Volume</th><th>Value</th><th>Currency</th></tr>';
     
     portfolioData.forEach(row => {
-        html += `<tr>
-            <td>${row['Kontonummer'] || ''}</td>
-            <td>${row['Namn'] || ''}</td>
-            <td>${row['Kortnamn'] || ''}</td>
-            <td>${row['Volym'] || ''}</td>
-            <td>${row['Marknadsvärde'] || ''}</td>
-            <td>${row['Valuta'] || ''}</td>
-        </tr>`;
+       const avanzaTicker = row['Kortnamn'] || '';
+const yahooTicker = convertTicker(avanzaTicker);
+
+html += `<tr>
+    <td>${row['Kontonummer'] || ''}</td>
+    <td>${row['Namn'] || ''}</td>
+    <td>${avanzaTicker}</td>
+    <td>${yahooTicker}</td>
+    <td>${row['Volym'] || ''}</td>
+    <td>${row['Marknadsvärde'] || ''}</td>
+    <td>${row['Valuta'] || ''}</td>
+</tr>`;
     });
     
     html += '</table>';

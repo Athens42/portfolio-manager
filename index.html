@@ -54,7 +54,6 @@
 // Portfolio Manager - Minimal Working Version
 console.log('Portfolio Manager starting...');
 
-
 let portfolioData = [];
 let tickerMapping = {};
 
@@ -105,7 +104,7 @@ function parseCSV(csvContent) {
             portfolioData.push(row);
         }
         
-         displayPortfolioData();
+        displayBasicData();
         console.log('Imported', portfolioData.length, 'holdings');
         
     } catch (error) {
@@ -133,156 +132,9 @@ function displayBasicData() {
     
     html += '</table>';
     container.innerHTML = html;
-    displayAccountSelection();
 }
 
-    // Account selection variables and functions
-let selectedAccounts = new Set();
-
-function displayAccountSelection() {
-    const container = document.getElementById('accountSelection');
-    
-    if (portfolioData.length === 0) {
-        container.innerHTML = '<p>Import CSV data first to see accounts.</p>';
-        return;
-    }
-    
-    const accounts = [...new Set(portfolioData.map(row => row['Kontonummer']).filter(acc => acc))];
-    
-    if (selectedAccounts.size === 0) {
-        accounts.forEach(acc => selectedAccounts.add(acc));
-    }
-    
-    let html = '<p>Select accounts to include in analysis:</p>';
-    
-    accounts.forEach(account => {
-        const isChecked = selectedAccounts.has(account);
-        html += `
-            <label style="display: block; margin: 5px 0;">
-                <input type="checkbox" ${isChecked ? 'checked' : ''} 
-                       onchange="toggleAccount('${account}')" />
-                Account: ${account}
-            </label>
-        `;
-    });
-    
-    html += '<br><button onclick="showSimpleAggregation()" style="margin-top: 10px;">Update Aggregated View</button>';
-    
-    container.innerHTML = html;
-}
-
-function toggleAccount(accountNumber) {
-    if (selectedAccounts.has(accountNumber)) {
-        selectedAccounts.delete(accountNumber);
-    } else {
-        selectedAccounts.add(accountNumber);
-    }
-}
-
-function showSimpleAggregation() {
-    const container = document.getElementById('aggregatedView');
-    container.innerHTML = '<p>Simple aggregation coming next step!</p>';
-}
-
-    // Convert ticker function
-function convertTicker(avanzaTicker) {
-    if (!avanzaTicker || avanzaTicker === '') return '';
-    if (tickerMapping[avanzaTicker]) {
-        return tickerMapping[avanzaTicker];
-    }
-    return avanzaTicker;
-}
-
-// Enhanced display with ticker mapping
-function displayPortfolioData() {
-    const container = document.getElementById('portfolioData');
-    let html = `<p>Successfully imported ${portfolioData.length} holdings!</p>`;
-    html += '<table border="1" style="width:100%; border-collapse: collapse;">';
-    html += '<tr><th>Account</th><th>Name</th><th>Avanza Ticker</th><th>Yahoo Ticker</th><th>Volume</th><th>Value</th><th>Currency</th></tr>';
-    
-    portfolioData.forEach((row, index) => {
-        const avanzaTicker = row['Kortnamn'] || '';
-        const yahooTicker = convertTicker(avanzaTicker);
-        const stockType = row['Typ'] || '';
-        
-        if (stockType === 'FUND') {
-            html += `<tr style="background-color: #f8f9fa; color: #6c757d;">
-                <td>${row['Kontonummer'] || ''}</td>
-                <td>${row['Namn'] || ''}</td>
-                <td>${avanzaTicker}</td>
-                <td><em>Fund</em></td>
-                <td>${row['Volym'] || ''}</td>
-                <td>${row['Marknadsvärde'] || ''}</td>
-                <td>${row['Valuta'] || ''}</td>
-            </tr>`;
-        } else {
-            html += `<tr>
-                <td>${row['Kontonummer'] || ''}</td>
-                <td>${row['Namn'] || ''}</td>
-                <td>${avanzaTicker}</td>
-                <td>${yahooTicker}</td>
-                <td>${row['Volym'] || ''}</td>
-                <td>${row['Marknadsvärde'] || ''}</td>
-                <td>${row['Valuta'] || ''}</td>
-            </tr>`;
-        }
-       
-    });
-    
-    html += '</table>';
-    container.innerHTML = html;
-    displayAccountSelection();
-}
-
-// Account selection variables and functions
-let selectedAccounts = new Set();
-
-function displayAccountSelection() {
-    const container = document.getElementById('accountSelection');
-    
-    if (portfolioData.length === 0) {
-        container.innerHTML = '<p>Import CSV data first to see accounts.</p>';
-        return;
-    }
-    
-    const accounts = [...new Set(portfolioData.map(row => row['Kontonummer']).filter(acc => acc))];
-    
-    if (selectedAccounts.size === 0) {
-        accounts.forEach(acc => selectedAccounts.add(acc));
-    }
-    
-    let html = '<p>Select accounts to include in analysis:</p>';
-    
-    accounts.forEach(account => {
-        const isChecked = selectedAccounts.has(account);
-        html += `
-            <label style="display: block; margin: 5px 0;">
-                <input type="checkbox" ${isChecked ? 'checked' : ''} 
-                       onchange="toggleAccount('${account}')" />
-                Account: ${account}
-            </label>
-        `;
-    });
-    
-    html += '<br><button onclick="showSimpleAggregation()" style="margin-top: 10px;">Update Aggregated View</button>';
-    
-    container.innerHTML = html;
-}
-
-function toggleAccount(accountNumber) {
-    if (selectedAccounts.has(accountNumber)) {
-        selectedAccounts.delete(accountNumber);
-    } else {
-        selectedAccounts.add(accountNumber);
-    }
-}
-
-function showSimpleAggregation() {
-    const container = document.getElementById('aggregatedView');
-    container.innerHTML = '<p>Simple aggregation coming next step!</p>';
-}
-    
-// Placeholder functions for buttons
+// Placeholder functions
 function fetchExchangeRates() {
     alert('Exchange rates - coming next!');
 }

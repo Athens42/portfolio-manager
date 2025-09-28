@@ -281,3 +281,135 @@ function updateAggregatedView() {
     
     container.innerHTML = html;
 }
+// Currency conversion functionality
+let exchangeRates = {
+    'SEK': 1.0,  // Base currency
+    'USD': 10.5, // Default rates - will be updated
+    'EUR': 11.5,
+    'DKK': 1.55
+};
+
+// Fetch current exchange rates
+async function fetchExchangeRates() {
+    const statusDiv = document.getElementById('exchangeRateStatus');
+    statusDiv.innerHTML = '<p>Fetching exchange rates...</p>';
+    
+    try {
+        // Using exchangerate-api.com (free tier)
+        const response = await fetch('https://api.exchangerate-api.com/v4/latest/SEK');
+        const data = await response.json();
+        
+        // Convert to SEK-based rates
+        exchangeRates = {
+            'SEK': 1.0,
+            'USD': 1 / data.rates.USD,
+            'EUR': 1 / data.rates.EUR,
+            'DKK': 1 / data.rates.DKK
+        };
+        
+        let html = '<p><strong>Exchange rates updated:</strong></p>';
+        html += '<ul>';
+        Object.entries(exchangeRates).forEach(([currency, rate]) => {
+            if (currency !== 'SEK') {
+                html += `<li>1 ${currency} = ${rate.toFixed(4)} SEK</li>`;
+            }
+        });
+        html += '</ul>';
+        html += `<p><em>Last updated: ${new Date().toLocaleString()}</em></p>`;
+        
+        statusDiv.innerHTML = html;
+        
+        // Update aggregated view if it exists
+        if (portfolioData.length > 0) {
+            updateAggregatedViewWithCurrency();
+        }
+        
+    } catch (error) {
+        console.error('Error fetching exchange rates:', error);
+        statusDiv.innerHTML = '<p style="color: red;">Error fetching exchange rates. Using default rates.</p>';
+    }
+}
+
+// Convert amount to SEK
+function convertToSEK(amount, currency) {
+    if (!currency || currency === 'SEK') return amount;
+    const rate = exchangeRates[currency] || 1;
+    return amount * rate;
+}
+
+// Enhanced aggregated view with currency conversion
+function updateAggregatedViewWithCurrency() {
+    const container = document.getElementById('aggregatedView');
+    
+    if (portfolioData.length === 0 || selectedAccounts.size === 0) {
+        container.innerHTML = '<p>Select accounts and ensure data is imported to see aggregated view.</p>';
+        return;
+    }
+    
+    const filteredData = portfolioData.filter(row => {
+        const account = row['Kontonummer'];
+        const type = row['Typ'];
+        return selectedAccounts.has(account) && type !== 'FUND';
+    });
+    
+    const aggregated = {};
+    
+    filteredData.forEach(row => {
+        const avanzaTicker = row['Kortnamn'] || '';
+        const yahooTicker = convertTicker(avanzaTicker);
+        const volume = parseFloat(row['Volym']) || 0;
+        const marketValue = parseFloat(row['Marknadsvärde'].replace(',', '.')) || 0;
+        const currency = row['Valuta'] || '';
+        const name = row['Namn'] || '';
+        
+        if (!yahooTicker || yahooTicker === '') return;
+        
+        if (!aggregated[yahooTicker]) {
+            aggregated[yahooTicker] = {
+                name: name,
+                ticker: yahooTicker,
+                totalVolume: 0,
+                totalValueOriginal: 0,
+                totalValueSEK: 0,
+                currency: currency,
+                accounts: new Set()
+            };
+        }
+        
+        aggregated[yahooTicker].totalVolume += volume;
+        aggregated[yahooTicker].totalValueOriginal += marketValue;
+        aggregated[yahooTicker].totalValueSEK += convertToSEK(marketValue, currency);
+        aggregated[yahooTicker].accounts.add(row['Kontonummer']);
+    });
+    
+    const sortedStocks = Object.values(aggregated).sort((a, b) => b.totalValueSEK - a.totalValueSEK);
+    
+    let html = `<p>Aggregated view for ${selectedAccounts.size} selected accounts (converted to SEK):</p>`;
+    html += '<table border="1" style="width:100%; border-collapse: collapse;">';
+    html += '<tr><th>Stock Name</th><th>Yahoo Ticker</th><th>Total Volume</th><th>Value (Original)</th><th>Value (SEK)</th><th>Currency</th><th>Accounts</th></tr>';
+    
+    let totalPortfolioValueSEK = 0;
+    
+    sortedStocks.forEach(stock => {
+        totalPortfolioValueSEK += stock.totalValueSEK;
+        html += `<tr>
+            <td>${stock.name}</td>
+            <td>${stock.ticker}</td>
+            <td>${stock.totalVolume.toLocaleString()}</td>
+            <td>${stock.totalValueOriginal.toLocaleString()} ${stock.currency}</td>
+            <td>${stock.totalValueSEK.toLocaleString('sv-SE')} SEK</td>
+            <td>${stock.currency}</td>
+            <td>${Array.from(stock.accounts).join(', ')}</td>
+        </tr>`;
+    });
+    
+    html += '</table>';
+    html += `<p><strong>Total Portfolio Value: ${totalPortfolioValueSEK.toLocaleString('sv-SE')} SEK</strong></p>`;
+    
+    container.innerHTML = html;
+}
+
+// Update the original updateAggregatedView to use currency conversion
+function updateAggregatedView() {
+    updateAggregatedViewWithCurrency();
+}

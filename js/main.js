@@ -421,6 +421,13 @@ let exchangeRates = {
     'DKK': 1.55
 };
 
+// Convert amount to SEK
+function convertToSEK(amount, currency) {
+    if (!currency || currency === 'SEK') return amount;
+    const rate = exchangeRates[currency] || 1;
+    return amount * rate;
+}
+
 // Fetch current exchange rates
 async function fetchExchangeRates() {
     const statusDiv = document.getElementById('exchangeRateStatus');

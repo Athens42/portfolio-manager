@@ -52,22 +52,11 @@
     </div>
       
 <script>
-// Updated: 2024-09-28-14:35 - Cache buster
-// Updated: 2024-09-28-20:30 - Cache buster
+// Updated: 2024-09-28-20:45 - Cache buster
 // Supabase configuration
 const SUPABASE_URL = 'https://zdobzwylyeonigdcsohv.supabase.co'
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpkb2J6d3lseWVvbmlnZGNzb2h2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkwODQ1MjgsImV4cCI6MjA3NDY2MDUyOH0.pFR1IYyu_uU1dGD363eeyyTVcAk2H7wHeYE-YSQoSMI'
-
-// Import Supabase client
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-    
- // Supabase configuration
-const SUPABASE_URL = 'https://zdobzwylyeonigdcsohv.supabase.co'
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpkb2J6d3lseWVvbmlnZGNzb2h2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkwODQ1MjgsImV4cCI6MjA3NDY2MDUyOH0.pFR1IYyu_uU1dGD363eeyyTVcAk2H7wHeYE-YSQoSMI'
-
-// Import Supabase (add this before your other code)
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
 // Portfolio Manager - Minimal Working Version
 console.log('Portfolio Manager starting...');

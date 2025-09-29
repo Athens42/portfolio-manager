@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portfolio Manager</title>
     <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
     <div class="container">
@@ -58,12 +59,11 @@ const SUPABASE_URL = 'https://zdobzwylyeonigdcsohv.supabase.co'
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpkb2J6d3lseWVvbmlnZGNzb2h2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkwODQ1MjgsImV4cCI6MjA3NDY2MDUyOH0.pFR1IYyu_uU1dGD363eeyyTVcAk2H7wHeYE-YSQoSMI'
 
 // Import Supabase client
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
     
  // Supabase configuration
-const SUPABASE_URL = 'your-project-url-here'
-const SUPABASE_ANON_KEY = 'your-anon-key-here'
+const SUPABASE_URL = 'https://zdobzwylyeonigdcsohv.supabase.co'
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpkb2J6d3lseWVvbmlnZGNzb2h2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkwODQ1MjgsImV4cCI6MjA3NDY2MDUyOH0.pFR1IYyu_uU1dGD363eeyyTVcAk2H7wHeYE-YSQoSMI'
 
 // Import Supabase (add this before your other code)
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'

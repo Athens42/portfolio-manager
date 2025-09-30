@@ -396,11 +396,16 @@ async function savePortfolioToSupabase() {
 // Load portfolio holdings from Supabase
 async function loadPortfolioFromSupabase() {
     try {
+        // Make sure ticker mapping is loaded first
+        if (Object.keys(tickerMapping).length === 0) {
+            await loadTickerMapping();
+        }
+        
         const { data, error } = await supabase
             .from('portfolio_holdings')
             .select('*')
             .order('import_date', { ascending: false })
-            .limit(200); // Get latest import
+            .limit(200);
             
         if (error) throw error;
         
@@ -418,7 +423,7 @@ async function loadPortfolioFromSupabase() {
             'Marknadsvärde': row.market_value.toString(),
             'Valuta': row.currency,
             'Typ': row.type,
-            'ISIN': row.isin
+            'ISIN': row.isin || ''
         }));
         
         displayBasicData();

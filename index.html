@@ -15,6 +15,8 @@
             <h2>Import Avanza CSV</h2>
             <input type="file" id="csvFileInput" accept=".csv" />
             <button id="importBtn" onclick="importCSV()">Import Portfolio Data</button>
+            <button onclick="savePortfolioToSupabase()" style="margin: 5px;">Save Portfolio to Database</button>
+            <button onclick="loadPortfolioFromSupabase()" style="margin: 5px;">Load Portfolio from Database</button>
         </div>
         
        <div class="section">
@@ -209,8 +211,6 @@ function importCSV() {
         return;
     }
     
-<button onclick="savePortfolioToSupabase()" style="margin: 5px;">Save Portfolio to Database</button>
-<button onclick="loadPortfolioFromSupabase()" style="margin: 5px;">Load Portfolio from Database</button>
     
     const reader = new FileReader();
     reader.onload = function(e) {

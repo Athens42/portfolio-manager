@@ -209,6 +209,9 @@ function importCSV() {
         return;
     }
     
+<button onclick="savePortfolioToSupabase()" style="margin: 5px;">Save Portfolio to Database</button>
+<button onclick="loadPortfolioFromSupabase()" style="margin: 5px;">Load Portfolio from Database</button>
+    
     const reader = new FileReader();
     reader.onload = function(e) {
         const csvContent = e.target.result;
@@ -217,8 +220,7 @@ function importCSV() {
     reader.readAsText(file);
 }
     
-<button onclick="savePortfolioToSupabase()" style="margin: 5px;">Save Portfolio to Database</button>
-<button onclick="loadPortfolioFromSupabase()" style="margin: 5px;">Load Portfolio from Database</button>
+
     
 // Parse CSV
 function parseCSV(csvContent) {

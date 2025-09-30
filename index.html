@@ -198,6 +198,7 @@ function updateAggregatedView() {
     
     container.innerHTML = html;
 }
+    
 // Import CSV function
 function importCSV() {
     const fileInput = document.getElementById('csvFileInput');
@@ -215,7 +216,10 @@ function importCSV() {
     };
     reader.readAsText(file);
 }
-
+    
+<button onclick="savePortfolioToSupabase()" style="margin: 5px;">Save Portfolio to Database</button>
+<button onclick="loadPortfolioFromSupabase()" style="margin: 5px;">Load Portfolio from Database</button>
+    
 // Parse CSV
 function parseCSV(csvContent) {
     try {

@@ -55,4 +55,19 @@
   "SWED A": "SWED-A.ST",
   "DANSKE": "DANSKE.CO"
   "SEDANA": "SEDANA.ST"
+},
+
+async function loadTickerMapping() {
+    // Small delay to ensure page is fully loaded
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    try {
+        const response = await fetch('data/ticker-mapping.json');
+        if (!response.ok) throw new Error('Failed to fetch ticker mapping');
+        tickerMapping = await response.json();
+        console.log('Ticker mapping loaded:', Object.keys(tickerMapping).length, 'mappings');
+    } catch (error) {
+        console.error('Error loading ticker mapping:', error);
+        tickerMapping = {};
+    }
 }

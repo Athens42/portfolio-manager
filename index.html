@@ -125,7 +125,7 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 console.log('Portfolio Manager starting...');
 
 let portfolioData = [];
-let tickerMapping = {};
+let tickerMapping = TICKER_MAPPINGS || {};
 
 // Load ticker mapping
 async function loadTickerMapping() {

@@ -202,7 +202,7 @@ function updateAggregatedView() {
 }
     
 // Import CSV function
-function importCSV() {
+async function importCSV() {
     const fileInput = document.getElementById('csvFileInput');
     const file = fileInput.files[0];
     
@@ -211,20 +211,23 @@ function importCSV() {
         return;
     }
     
-    
     const reader = new FileReader();
-    reader.onload = function(e) {
+    reader.onload = async function(e) {
         const csvContent = e.target.result;
-        parseCSV(csvContent);
+        await parseCSV(csvContent);
     };
     reader.readAsText(file);
 }
     
-
-    
 // Parse CSV
-function parseCSV(csvContent) {
+async function parseCSV(csvContent) {
     try {
+        // Ensure ticker mapping is loaded
+        if (Object.keys(tickerMapping).length === 0) {
+            console.log('Waiting for ticker mapping to load...');
+            await loadTickerMapping();
+        }
+        
         const lines = csvContent.split('\n');
         const headers = lines[0].split(';');
         portfolioData = [];

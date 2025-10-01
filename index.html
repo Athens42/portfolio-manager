@@ -284,9 +284,9 @@ async function importCSV() {
 async function parseCSV(csvContent) {
     try {
         // Ensure ticker mapping is loaded
-        if (Object.keys(tickerMapping).length === 0) {
-            console.log('Waiting for ticker mapping to load...');
-            await loadTickerMapping();
+//         if (Object.keys(tickerMapping).length === 0) {
+//            console.log('Waiting for ticker mapping to load...');
+//          await loadTickerMapping();
         }
         
         const lines = csvContent.split('\n');
@@ -513,7 +513,7 @@ function calculateCurrentTotalValue() {
         const marketValue = parseFloat(row['Marknadsvärde'].replace(',', '.')) || 0;
         total += marketValue;
     });
-    
+//    
     return total;
 }
 
@@ -528,8 +528,9 @@ function fetchStockPrices() {
 }
 
 // Initialize
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('Portfolio Manager loaded successfully!');
-    loadTickerMapping();
-});
+    
+//document.addEventListener('DOMContentLoaded', function() {
+//  console.log('Portfolio Manager loaded successfully!');
+//    loadTickerMapping();
+//});
 </script>

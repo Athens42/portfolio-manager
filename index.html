@@ -6,67 +6,6 @@
     <title>Portfolio Manager</title>
     <link rel="stylesheet" href="css/styles.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
-// Inline the ticker mapping to avoid loading issues
-const TICKER_MAPPINGS = {
-  "SIVE": "SIVE.ST",
-  "SEYE": "SEYE.ST",
-  "SEZI": "SEZI.ST",
-  "XVIVO": "XVIVO.ST",
-  "HNSA": "HNSA.ST",
-  "BIOA B": "BIOA-B.ST",
-  "GAPW B": "GAPW-B.ST",
-  "IMMNOV": "IMMNOV.ST",
-  "DVYSR": "DVYSR.ST",
-  "CAMX": "CAMX.ST",
-  "AAK": "AAK.ST",
-  "INVE B": "INVE-B.ST",
-  "ABB": "ABB.ST",
-  "INVE A": "INVE-A.ST",
-  "RMSp": "RMS.PA",
-  "ATCO B": "ATCO-B.ST",
-  "ASMLa": "ASML.AS",
-  "MSFT": "MSFT",
-  "MCp": "MC.PA",
-  "V": "V",
-  "SHB A": "SHB-A.ST",
-  "ABBV": "ABBV",
-  "VOLV B": "VOLV-B.ST",
-  "JPM": "JPM",
-  "ALFA": "ALFA.ST",
-  "EPI B": "EPI-B.ST",
-  "PG": "PG",
-  "NOVO B": "NOVO-B.CO",
-  "AQ": "AQ.ST",
-  "BIOG B": "BIOG-B.ST",
-  "EVO": "EVO.ST",
-  "HPOL B": "HPOL-B.ST",
-  "SYSR": "SYSR.ST",
-  "IPCO": "IPCO.ST",
-  "ALIV SDB": "ALIV-SDB.ST",
-  "LUG": "LUG.ST",
-  "SECT B": "SECT-B.ST",
-  "MYCR": "MYCR.ST",
-  "NEWA B": "NEWA-B.ST",
-  "ENGCON B": "ENGCON-B.ST",
-  "VIT B": "VIT-B.ST",
-  "SECU B": "SECU-B.ST",
-  "BOL": "BOL.ST",
-  "HEXA B": "HEXA-B.ST",
-  "IVGm": "IVG.MI",
-  "ESSITY B": "ESSITY-B.ST",
-  "INDU C": "INDU-C.ST",
-  "SEB A": "SEB-A.ST",
-  "NDA SE": "NDA-SE.ST",
-  "ATCO A": "ATCO-A.ST",
-  "AZN": "AZN.ST",
-  "8TRA": "8TRA.ST",
-  "SKF B": "SKF-B.ST",
-  "SWED A": "SWED-A.ST",
-  "DANSKE": "DANSKE.CO",
-  "SEDANA": "SEDANA.ST"
-};
-</script>
 </head>
 <body>
     <div class="container">
@@ -125,7 +64,7 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 console.log('Portfolio Manager starting...');
 
 let portfolioData = [];
-let tickerMapping = TICKER_MAPPINGS || {};
+let tickerMapping = {};
 
 // Load ticker mapping
 async function loadTickerMapping() {
@@ -263,7 +202,7 @@ function updateAggregatedView() {
 }
     
 // Import CSV function
-async function importCSV() {
+function importCSV() {
     const fileInput = document.getElementById('csvFileInput');
     const file = fileInput.files[0];
     
@@ -272,23 +211,20 @@ async function importCSV() {
         return;
     }
     
+    
     const reader = new FileReader();
-    reader.onload = async function(e) {
+    reader.onload = function(e) {
         const csvContent = e.target.result;
-        await parseCSV(csvContent);
+        parseCSV(csvContent);
     };
     reader.readAsText(file);
 }
     
+
+    
 // Parse CSV
-async function parseCSV(csvContent) {
+function parseCSV(csvContent) {
     try {
-        // Ensure ticker mapping is loaded
-//         if (Object.keys(tickerMapping).length === 0) {
-//            console.log('Waiting for ticker mapping to load...');
-//          await loadTickerMapping();
-        }
-        
         const lines = csvContent.split('\n');
         const headers = lines[0].split(';');
         portfolioData = [];
@@ -460,16 +396,11 @@ async function savePortfolioToSupabase() {
 // Load portfolio holdings from Supabase
 async function loadPortfolioFromSupabase() {
     try {
-        // Make sure ticker mapping is loaded first
-        if (Object.keys(tickerMapping).length === 0) {
-            await loadTickerMapping();
-        }
-        
         const { data, error } = await supabase
             .from('portfolio_holdings')
             .select('*')
             .order('import_date', { ascending: false })
-            .limit(200);
+            .limit(200); // Get latest import
             
         if (error) throw error;
         
@@ -487,7 +418,7 @@ async function loadPortfolioFromSupabase() {
             'Marknadsvärde': row.market_value.toString(),
             'Valuta': row.currency,
             'Typ': row.type,
-            'ISIN': row.isin || ''
+            'ISIN': row.isin
         }));
         
         displayBasicData();
@@ -513,7 +444,7 @@ function calculateCurrentTotalValue() {
         const marketValue = parseFloat(row['Marknadsvärde'].replace(',', '.')) || 0;
         total += marketValue;
     });
-//    
+    
     return total;
 }
 
@@ -528,9 +459,8 @@ function fetchStockPrices() {
 }
 
 // Initialize
-    
-//document.addEventListener('DOMContentLoaded', function() {
-//  console.log('Portfolio Manager loaded successfully!');
-//    loadTickerMapping();
-//});
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Portfolio Manager loaded successfully!');
+    loadTickerMapping();
+});
 </script>

@@ -6,6 +6,7 @@
     <title>Portfolio Manager</title>
     <link rel="stylesheet" href="css/styles.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="data/ticker-mapping.js"></script>
 </head>
 <body>
     <div class="container">
@@ -64,18 +65,12 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 console.log('Portfolio Manager starting...');
 
 let portfolioData = [];
-let tickerMapping = {};
+let tickerMapping = window.TICKER_MAPPING || {};
 
 // Load ticker mapping
-async function loadTickerMapping() {
-    try {
-        const response = await fetch('data/ticker-mapping.json');
-        tickerMapping = await response.json();
-        console.log('Ticker mapping loaded:', Object.keys(tickerMapping).length, 'mappings');
-    } catch (error) {
-        console.error('Error loading ticker mapping:', error);
-        tickerMapping = {};
-    }
+function loadTickerMapping() {
+    tickerMapping = window.TICKER_MAPPING || {};
+    console.log('Ticker mapping loaded:', Object.keys(tickerMapping).length, 'mappings');
 }
 
 // Convert Ticker function
